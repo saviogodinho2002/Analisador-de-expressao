@@ -53,7 +53,7 @@ fun calculateAddSub(expression: String): String {
 }
 
 
-fun searchParentesis(expression: String): String {
+fun searchParentheses(expression: String): String {
 
 
     val matchOpen = regexExp.openParenthesesRegex.findAll(expression);
@@ -61,12 +61,17 @@ fun searchParentesis(expression: String): String {
 
     try {
         val open = matchOpen.first().range.first;
-        val close = matchClose.first().range.first;
+        val nextClose = matchClose.first().range.first;
 
+        matchClose.count();
 
-        println("$open $close")
+        println("$open $nextClose")
 
-        val expBetween = expression.subSequence(open + 1, close).toString();
+        var expBetween = expression.subSequence(open + 1, nextClose).toString();
+
+        val close = regexExp.openParenthesesRegex.findAll(expBetween).count()
+
+        expBetween = expression.subSequence(open + 1, matchClose.elementAt( close ).range.first).toString();
 
         val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
 
@@ -84,7 +89,7 @@ fun searchExpressions(expression: String): String {
     if(regexExp.finalResult.containsMatchIn(expression))
         return expression;
     else if (regexExp.openParenthesesRegex.containsMatchIn(expression) || regexExp.closeParenthesesRegex.containsMatchIn(expression))
-        return searchParentesis(expression);
+        return searchParentheses(expression);
 
     else if (regexExp.mulDivRegex.containsMatchIn(expression))
         return calculateMulDiv(expression);
@@ -99,7 +104,7 @@ fun searchExpressions(expression: String): String {
 fun main() {
 
 
-    val expression: String = "(10+6)/2".replace(" ","");
+    val expression: String = "((10+6)/2)+2+1))".replace(" ","");
 
     println(searchExpressions(expression));
 
