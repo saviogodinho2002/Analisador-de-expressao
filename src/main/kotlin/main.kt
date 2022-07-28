@@ -58,20 +58,28 @@ fun searchParentheses(expression: String): String {
 
     val matchOpen = regexExp.openParenthesesRegex.findAll(expression);
     val matchClose = regexExp.closeParenthesesRegex.findAll(expression);
-
+    val open = matchOpen.first().range.first;
     try {
-        val open = matchOpen.first().range.first;
-        val nextClose = matchClose.first().range.first;
+        var nextClose:Int;// = matchClose.elementAt(0).range.first;
 
-        matchClose.count();
+       // println("$open $nextClose")
 
-        println("$open $nextClose")
+        //enquanto olhando a string o  euando os count de nextClose e close forem diferentes
+        var expBetween:String;// = expression.subSequence(open + 1, nextClose).toString();
 
-        var expBetween = expression.subSequence(open + 1, nextClose).toString();
+        var openCount:Int;
 
-        val close = regexExp.openParenthesesRegex.findAll(expBetween).count()
+        var iterator:Int = 0;
+        do{
+            nextClose = matchClose.elementAt(iterator).range.first; //pegar o indice do proximo fechamento no iterator
+            expBetween = expression.subSequence(open + 1, nextClose).toString(); // substring do '( 'ate o primeiro ')'
 
-        expBetween = expression.subSequence(open + 1, matchClose.elementAt( close ).range.first).toString();
+            openCount = regexExp.openParenthesesRegex.findAll(expBetween).count(); //confere quantas aberturas tem no intervalo
+
+            expBetween = expression.subSequence(open + 1, matchClose.elementAt( openCount ).range.first   ).toString() // pega o intervalo ate a abertura atual
+
+
+        }while ( openCount != iterator++); // o numero de abertura deve ser igual ao do contador
 
         val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
 
@@ -104,7 +112,7 @@ fun searchExpressions(expression: String): String {
 fun main() {
 
 
-    val expression: String = "((10+6)/2)+2+1))".replace(" ","");
+    val expression: String = "((10+62)/((4)+(5)))".replace(" ","");
 
     println(searchExpressions(expression));
 
