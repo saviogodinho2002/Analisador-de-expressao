@@ -1,11 +1,11 @@
 object RegexExp {
-    val mulDivRegex = "(\\d+|\\d*\\.\\d+)[*/]{1}(\\d*\\.\\d+|\\d+)".toRegex();
-    val addSubRegex = "(\\d+|\\d*\\.\\d+)[+-]{1}(\\d*\\.\\d+|\\d+)".toRegex();
+    val mulDivRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+    val addSubRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^[-]{0,1}((\\d*\\.\\d+)|(\\d+))$".toRegex();
-    val numberRegex = "((\\d*\\.\\d+)|(\\d+))".toRegex();
-    val genericExpression = "((\\d+\\.\\d+)|(\\d+))[-+*/]((\\d+\\.\\d+)|(\\d+))".toRegex()
+    val finalResult = "^[-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)$".toRegex();
+    val numberRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+
     val operationSimbols = "[-+*/]".toRegex();
     val multSinal = "[-+]{2}".toRegex();
     
@@ -108,8 +108,8 @@ fun searchExpressions(expression: String): String {
 fun main() {
 
 
-    val expression: String = "5+.6".replace(" ","")
-   // println(expression)
+    val expression: String = "5.+(-.6)".replace(" ","")
+    println(expression)
     println(searchExpressions(expression));
 
 }
