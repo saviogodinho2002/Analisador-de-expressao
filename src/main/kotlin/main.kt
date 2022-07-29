@@ -7,12 +7,12 @@ object RegexExp {
     val numberRegex = "((\\d+\\.\\d+)|(\\d+))".toRegex();
     val genericExpression = "((\\d+\\.\\d+)|(\\d+))[-+*/]((\\d+\\.\\d+)|(\\d+))".toRegex()
     val operationSimbols = "[-+*/]".toRegex();
+
     
 }
 
-fun calculate(expression: String): String {
-    val match = RegexExp.genericExpression.findAll(expression);
-
+fun calculateMulDiv(expression: String): String {
+    val match = RegexExp.mulDivRegex.findAll(expression);
     val eqExpression = match.first().value;
 
     val matchNumber = RegexExp.numberRegex.findAll(eqExpression)
@@ -23,11 +23,26 @@ fun calculate(expression: String): String {
     var result = when (RegexExp.operationSimbols.findAll(eqExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
         "/" -> (firstNumber.toDouble() / secondNumber.toDouble()).toString()
-        "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
-        "-" -> (firstNumber.toDouble() - secondNumber.toDouble()).toString()
-        else -> "0";
+        else -> throw Exception("Expressão mal formulada");
     }
     return searchExpressions(expression.replace(eqExpression, result));
+
+}
+fun calculateAddSub(expression: String): String {
+    val match = RegexExp.addSubRegex.findAll(expression);
+    val currentExpression = match.first().value;
+
+    val matchNumber = RegexExp.numberRegex.findAll(currentExpression)
+
+    val firstNumber = matchNumber.first().value;
+    val secondNumber = matchNumber.elementAt(1).value
+
+    var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
+        "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
+        "-" -> (firstNumber.toDouble() - secondNumber.toDouble()).toString()
+        else -> throw Exception("Expressão mal formulada");
+    }
+    return searchExpressions(expression.replace(currentExpression, result));
 
 }
 
@@ -37,29 +52,26 @@ fun searchParentheses(expression: String): String {
     val matchOpen = RegexExp.openParenthesesRegex.findAll(expression);
     val matchClose = RegexExp.closeParenthesesRegex.findAll(expression);
     val open = matchOpen.first().range.first;
-    try {
-        var nextClose:Int;
-        var expBetween:String;
 
-        var openCount:Int;
+    var nextClose:Int;
+    var expBetween:String;
 
-        var iterator:Int = 0;
-        do{
-            nextClose = matchClose.elementAt(iterator).range.first;
-            expBetween = expression.subSequence(open + 1, nextClose).toString();
-            openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
-            expBetween = expression.subSequence(open + 1, matchClose.elementAt( openCount ).range.first   ).toString()
+    var openCount:Int;
 
-        }while ( openCount != iterator++);
+    var iterator:Int = 0;
+    do{
+        nextClose = matchClose.elementAt(iterator).range.first;
+        expBetween = expression.subSequence(open + 1, nextClose).toString();
+        openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
 
-        val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
+    }while ( openCount != iterator++);
 
-        return searchExpressions(nExp);
-    } catch (e: Exception) {
+    expBetween = expression.subSequence(open + 1, matchClose.elementAt( openCount ).range.first   ).toString();
 
-    }
+    val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
 
-    return "Expressão mal formulada";
+    return searchExpressions(nExp);
+
 
 }
 
@@ -71,19 +83,19 @@ fun searchExpressions(expression: String): String {
         return searchParentheses(expression);
 
     else if (RegexExp.mulDivRegex.containsMatchIn(expression))
-        return calculate(expression);
+        return calculateMulDiv(expression);
 
     else if (RegexExp.addSubRegex.containsMatchIn(expression))
-        return calculate(expression);
+        return calculateAddSub(expression);
 
-    return "0";
+    throw Exception("Expressão mal formulada")
 }
 
 
 fun main() {
 
 
-    val expression: String = "((10+62)/(2+2))".replace(" ","");
+    val expression: String = "(1+3+4)*5".replace(" ","");
 
     println(searchExpressions(expression));
 
