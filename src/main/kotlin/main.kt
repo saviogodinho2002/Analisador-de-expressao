@@ -87,28 +87,21 @@ fun searchParentheses(expression: String): String {
 }
 
 fun searchExpressions(expression: String): String {
-
-    if(RegexExp.multSinal.containsMatchIn(expression))
-        return sinalGame(expression);
-    else if(RegexExp.finalResult.containsMatchIn(expression))
-        return expression;
-    else if (RegexExp.openParenthesesRegex.containsMatchIn(expression) || RegexExp.closeParenthesesRegex.containsMatchIn(expression))
-        return searchParentheses(expression);
-
-    else if (RegexExp.mulDivRegex.containsMatchIn(expression))
-        return calculateMulDiv(expression);
-
-    else if (RegexExp.addSubRegex.containsMatchIn(expression))
-        return calculateAddSub(expression);
-
-    throw Exception("Expressão mal formulada")
+    return when{
+        RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
+        RegexExp.finalResult.containsMatchIn(expression) -> expression;
+        RegexExp.openParenthesesRegex.containsMatchIn(expression) || RegexExp.closeParenthesesRegex.containsMatchIn(expression) -> searchParentheses(expression);
+        RegexExp.mulDivRegex.containsMatchIn(expression)-> calculateMulDiv(expression);
+        RegexExp.addSubRegex.containsMatchIn(expression) -> calculateAddSub(expression);
+        else -> throw Exception("Expressão mal formulada")
+    }
 }
 
 
 fun main() {
 
 
-    val expression: String = "5.+(-.6)".replace(" ","")
+    val expression: String = "(5.0+(-0.6))/2";
     println(expression)
     println(searchExpressions(expression));
 
