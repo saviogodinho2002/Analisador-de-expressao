@@ -1,10 +1,10 @@
 object RegexExp {
-    val mulDivRegex = "(\\d+|\\d+\\.\\d+)[*/]{1}(\\d+\\.\\d+|\\d+)".toRegex();
-    val addSubRegex = "(\\d+|\\d+\\.\\d+)[+-]{1}(\\d+\\.\\d+|\\d+)".toRegex();
+    val mulDivRegex = "(\\d+|\\d*\\.\\d+)[*/]{1}(\\d*\\.\\d+|\\d+)".toRegex();
+    val addSubRegex = "(\\d+|\\d*\\.\\d+)[+-]{1}(\\d*\\.\\d+|\\d+)".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^[-]{0,1}((\\d+\\.\\d+)|(\\d+))$".toRegex();
-    val numberRegex = "((\\d+\\.\\d+)|(\\d+))".toRegex();
+    val finalResult = "^[-]{0,1}((\\d*\\.\\d+)|(\\d+))$".toRegex();
+    val numberRegex = "((\\d*\\.\\d+)|(\\d+))".toRegex();
     val genericExpression = "((\\d+\\.\\d+)|(\\d+))[-+*/]((\\d+\\.\\d+)|(\\d+))".toRegex()
     val operationSimbols = "[-+*/]".toRegex();
     val multSinal = "[-+]{2}".toRegex();
@@ -87,29 +87,27 @@ fun searchParentheses(expression: String): String {
 }
 
 fun searchExpressions(expression: String): String {
-    if(RegexExp.multSinal.containsMatchIn(expression))
-        return sinalGame(expression);
+    when{
+        RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
 
-    else if(RegexExp.finalResult.containsMatchIn(expression))
-        return expression;
+        RegexExp.finalResult.containsMatchIn(expression) -> expression;
 
-    else if (RegexExp.openParenthesesRegex.containsMatchIn(expression) && RegexExp.closeParenthesesRegex.containsMatchIn(expression))
-        return searchParentheses(expression);
+        RegexExp.openParenthesesRegex.containsMatchIn(expression) && RegexExp.closeParenthesesRegex.containsMatchIn(expression) -> searchParentheses(expression);
 
-    else if (RegexExp.mulDivRegex.containsMatchIn(expression))
-        return calculateMulDiv(expression);
+        RegexExp.mulDivRegex.containsMatchIn(expression)-> calculateMulDiv(expression);
 
-    else if (RegexExp.addSubRegex.containsMatchIn(expression))
-        return calculateAddSub(expression);
+        RegexExp.addSubRegex.containsMatchIn(expression) -> calculateAddSub(expression);
 
+        else -> throw Exception("Expressão mal formulada")
+    }
     throw Exception("Expressão mal formulada")
 }
 
 
 fun main() {
 
-
-    val expression: String = "5+(1-2)".replace(" ","");
+    
+    val expression: String = "4--+-4".replace(" ","");
 
     println(searchExpressions(expression));
 
