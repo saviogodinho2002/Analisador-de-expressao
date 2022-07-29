@@ -3,11 +3,11 @@ object RegexExp {
     val addSubRegex = "(\\d+|\\d+\\.\\d+)[+-]{1}(\\d+\\.\\d+|\\d+)".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^((\\d+\\.\\d+)|(\\d+))$".toRegex();
+    val finalResult = "^[-]{0,1}((\\d+\\.\\d+)|(\\d+))$".toRegex();
     val numberRegex = "((\\d+\\.\\d+)|(\\d+))".toRegex();
     val genericExpression = "((\\d+\\.\\d+)|(\\d+))[-+*/]((\\d+\\.\\d+)|(\\d+))".toRegex()
     val operationSimbols = "[-+*/]".toRegex();
-
+    val multSinal = "[-+]{2}".toRegex();
     
 }
 
@@ -45,6 +45,17 @@ fun calculateAddSub(expression: String): String {
     return searchExpressions(expression.replace(currentExpression, result));
 
 }
+fun sinalGame(expression: String):String{
+    val matchSinals = RegexExp.multSinal.findAll(expression);
+    val sinals = matchSinals.first().value;
+    val first = sinals[0];
+    val second = sinals[1];
+    return if(first == second)
+        searchExpressions(expression.replaceFirst(sinals,"+"));
+    else
+        searchExpressions(expression.replaceFirst(sinals,"-"));
+
+}
 
 fun searchParentheses(expression: String): String {
 
@@ -76,10 +87,13 @@ fun searchParentheses(expression: String): String {
 }
 
 fun searchExpressions(expression: String): String {
+    if(RegexExp.multSinal.containsMatchIn(expression))
+        return sinalGame(expression);
 
-    if(RegexExp.finalResult.containsMatchIn(expression))
+    else if(RegexExp.finalResult.containsMatchIn(expression))
         return expression;
-    else if (RegexExp.openParenthesesRegex.containsMatchIn(expression) || RegexExp.closeParenthesesRegex.containsMatchIn(expression))
+
+    else if (RegexExp.openParenthesesRegex.containsMatchIn(expression) && RegexExp.closeParenthesesRegex.containsMatchIn(expression))
         return searchParentheses(expression);
 
     else if (RegexExp.mulDivRegex.containsMatchIn(expression))
@@ -95,7 +109,7 @@ fun searchExpressions(expression: String): String {
 fun main() {
 
 
-    val expression: String = "(1+3+4)*5".replace(" ","");
+    val expression: String = "5+(1-2)".replace(" ","");
 
     println(searchExpressions(expression));
 
