@@ -15,13 +15,9 @@ object RegexExp {
 fun calculateMulDiv(expression: String): String {
     val match = RegexExp.mulDivRegex.findAll(expression);
     val eqExpression = match.first().value;
-
     val matchNumber = RegexExp.numberSignedRegex.findAll(eqExpression)
-
-
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
-
 
     var result = when (RegexExp.operationSimbols.findAll(eqExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
@@ -40,7 +36,6 @@ fun calculateAddSub(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
 
-    println("aa $firstNumber $secondNumber")
 
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
@@ -124,7 +119,7 @@ fun searchParentheses(expression: String): String {
 
 }
 fun searchExpressions(expression: String): String {
-    println(expression)
+
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
         RegexExp.finalResult.containsMatchIn(expression) -> RegexExp.numberSignedRegex.findAll(expression).first().value ;
@@ -135,7 +130,7 @@ fun searchExpressions(expression: String): String {
     }
 }
 fun main() {
-    var expression: String = "1+(.5-)+4.*3))*2";
+    var expression: String = "1+(.5-)+-4.*3))*2";
     println(expression)
     expression = fixParentheses(expression)
     println(expression)
