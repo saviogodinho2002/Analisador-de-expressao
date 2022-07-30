@@ -1,11 +1,12 @@
 object RegexExp {
-    val mulDivRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+    val mulDivRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
     val addSubRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^[-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)$".toRegex();
+    val finalResult = "^[-+]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[-+*/]*$".toRegex();
     val numberRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
-
+    val numberSignedRegex = "([+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+))".toRegex();
+    val matchMissNumber = "[\\(]+[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{0,1}[\\)]+".toRegex();
     val operationSimbols = "[-+*/]".toRegex();
     val multSinal = "[-+]{2}".toRegex();
     
@@ -15,10 +16,13 @@ fun calculateMulDiv(expression: String): String {
     val match = RegexExp.mulDivRegex.findAll(expression);
     val eqExpression = match.first().value;
 
-    val matchNumber = RegexExp.numberRegex.findAll(eqExpression)
+    val matchNumber = RegexExp.numberSignedRegex.findAll(eqExpression)
+
 
     val firstNumber = matchNumber.first().value;
-    val secondNumber = matchNumber.elementAt(1).value
+    val secondNumber =  matchNumber.elementAt(1).value
+
+    println("a aaaaa $firstNumber $secondNumber")
 
     var result = when (RegexExp.operationSimbols.findAll(eqExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
@@ -32,7 +36,7 @@ fun calculateAddSub(expression: String): String {
     val match = RegexExp.addSubRegex.findAll(expression);
     val currentExpression = match.first().value;
 
-    val matchNumber = RegexExp.numberRegex.findAll(currentExpression)
+    val matchNumber = RegexExp.numberSignedRegex.findAll(currentExpression)
 
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
@@ -56,9 +60,43 @@ fun sinalGame(expression: String):String{
         searchExpressions(expression.replaceFirst(sinals,"-"));
 
 }
+fun fixParentheses(expression: String):String{
+    val matchOpen = RegexExp.openParenthesesRegex.findAll(expression);
+    val matchClose = RegexExp.closeParenthesesRegex.findAll(expression);
+    val diff = matchOpen.count() - matchClose.count();
 
+    if(diff == 0){
+        return expression;
+    }
+    var nExpression= expression;
+    if(diff < 0){
+        repeat(diff * -1){
+            nExpression = "($nExpression";
+        }
+    }else if(diff > 0){
+        repeat((diff)) {
+            nExpression = "$nExpression)";
+        }
+    }
+
+    return fixParentheses(nExpression);
+}
+fun removeMissingParentheses(expression: String):String{
+    if(!RegexExp.matchMissNumber.containsMatchIn(expression)){
+        return expression;
+    }
+    val matchMissNumber = RegexExp.matchMissNumber.findAll(expression);
+    var subExp = matchMissNumber.first().value;
+    var nExpression = expression;
+    var whithoutParentheses = subExp.replaceFirst(RegexExp.openParenthesesRegex,"").replaceFirst(RegexExp.closeParenthesesRegex,"")
+
+    nExpression = nExpression.replace(subExp ,
+       whithoutParentheses
+    )
+
+    return removeMissingParentheses(nExpression);
+}
 fun searchParentheses(expression: String): String {
-
 
     val matchOpen = RegexExp.openParenthesesRegex.findAll(expression);
     val matchClose = RegexExp.closeParenthesesRegex.findAll(expression);
@@ -83,26 +121,26 @@ fun searchParentheses(expression: String): String {
 
     return searchExpressions(nExp);
 
-
 }
-
 fun searchExpressions(expression: String): String {
+    println(expression)
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
-        RegexExp.finalResult.containsMatchIn(expression) -> expression;
+        RegexExp.finalResult.containsMatchIn(expression) -> RegexExp.numberSignedRegex.findAll(expression).first().value ;
         RegexExp.openParenthesesRegex.containsMatchIn(expression) || RegexExp.closeParenthesesRegex.containsMatchIn(expression) -> searchParentheses(expression);
         RegexExp.mulDivRegex.containsMatchIn(expression)-> calculateMulDiv(expression);
         RegexExp.addSubRegex.containsMatchIn(expression) -> calculateAddSub(expression);
         else -> throw Exception("Expressão mal formulada")
     }
 }
-
-
 fun main() {
-
-
-    val expression: String = "(5.0+(-0.6))/2";
+    var expression: String = "(-.5-)+4.))*2";
     println(expression)
-    println(searchExpressions(expression));
+    expression = fixParentheses(expression)
+    println(expression)
+    expression = removeMissingParentheses(expression)
+    println(expression)
+
+    println(searchExpressions(expression).toDouble());
 
 }
