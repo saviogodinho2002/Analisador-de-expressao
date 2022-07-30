@@ -22,7 +22,6 @@ fun calculateMulDiv(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
 
-    println("a aaaaa $firstNumber $secondNumber")
 
     var result = when (RegexExp.operationSimbols.findAll(eqExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
@@ -41,9 +40,11 @@ fun calculateAddSub(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
 
+    println("aa $firstNumber $secondNumber")
+
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
-        "-" -> (firstNumber.toDouble() - secondNumber.toDouble()).toString()
+        "-" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
         else -> throw Exception("Expressão mal formulada");
     }
     return searchExpressions(expression.replace(currentExpression, result));
@@ -134,7 +135,7 @@ fun searchExpressions(expression: String): String {
     }
 }
 fun main() {
-    var expression: String = "(-.5-)+4.))*2";
+    var expression: String = "1+(.5-)+4.*3))*2";
     println(expression)
     expression = fixParentheses(expression)
     println(expression)
