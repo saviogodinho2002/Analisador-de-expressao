@@ -130,18 +130,25 @@ fun searchExpressions(expression: String): String {
         else -> throw Exception("Expressão mal formulada")
     }
 }
+fun getResult(expression: String):Double{
+            var exp:String = "($expression)";
+            exp = fixParentheses(exp)
+            exp = removeMissingParentheses(exp)
+            return RegexExp.numberSignedRegex.findAll(
+                searchExpressions(exp)
+            ).first().value.toDouble();
+        }
 fun main() {
-    var expression: String = ")(9*2)+))(10/5)";
+    var expression: String = "6*5)/-2(+5";
 
-    expression = "($expression)"
-    expression = fixParentheses(expression)
-
-    expression = removeMissingParentheses(expression)
 
     historic = mutableSetOf();
-    println(    RegexExp.numberSignedRegex.findAll( (searchExpressions(expression) )).first().value.toDouble()  );
+    println(   getResult(expression) );
+    
     historic.forEach {
        println(it)
    }
+
+}
 
 }
