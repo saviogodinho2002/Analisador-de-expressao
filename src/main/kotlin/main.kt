@@ -109,6 +109,7 @@ fun searchParentheses(expression: String): String {
             open = matchOpen.elementAt(iterator).range.first;
             close = matchClose.first().range.first;
             expBetween = expression.subSequence(open + 1, close).toString();
+            println(expBetween)
             openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
 
             iterator++;
@@ -119,17 +120,17 @@ fun searchParentheses(expression: String): String {
 
         return searchExpressions(nExp);
 
-    }catch (error: Exception){
+    }catch (error: StringIndexOutOfBoundsException){
+        println(error)
         return searchParentheses("($expression)")
     }
-
 }
 fun searchExpressions(expression: String): String {
     historic.add(expression);
     println(expression)
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
-        RegexExp.finalResult.containsMatchIn(expression) -> expression;
+        RegexExp.finalResult.containsMatchIn(expression)||expression.isEmpty() -> expression;
         RegexExp.openParenthesesRegex.containsMatchIn(expression) || RegexExp.closeParenthesesRegex.containsMatchIn(expression) -> searchParentheses(expression);
         RegexExp.mulDivRegex.containsMatchIn(expression)-> calculateMulDiv(expression);
         RegexExp.addSubRegex.containsMatchIn(expression) -> calculateAddSub(expression);
@@ -145,7 +146,7 @@ fun getResult(expression: String):Double{
             ).first().value.toDouble();
 }
 fun main() {
-    var expression: String = "6/2*)(2+1";
+    var expression: String = "5)(+)(2";
 
 
     historic = mutableSetOf();
