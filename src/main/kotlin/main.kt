@@ -97,30 +97,36 @@ fun searchParentheses(expression: String): String {
 
     val matchOpen = RegexExp.openParenthesesRegex.findAll(expression);
     val matchClose = RegexExp.closeParenthesesRegex.findAll(expression);
-    val open = matchOpen.first().range.first;
 
-    var nextClose:Int;
+    var open:Int;
+    var close:Int;
     var expBetween:String;
-
     var openCount:Int;
+    println(expression)
+    try{
+        var iterator: Int = 0;
+        do {
+            open = matchOpen.elementAt(iterator).range.first;
+            close = matchClose.first().range.first;
+            expBetween = expression.subSequence(open + 1, close).toString();
+            openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
 
-    var iterator:Int = 0;
-    do{
-        nextClose = matchClose.elementAt(iterator).range.first;
-        expBetween = expression.subSequence(open + 1, nextClose).toString();
-        openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
+            iterator++;
+        } while (openCount > 0);
+        expBetween = expression.subSequence(open + 1, matchClose.elementAt( openCount ).range.first   ).toString();
 
-    }while ( openCount != iterator++);
+        val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
 
-    expBetween = expression.subSequence(open + 1, matchClose.elementAt( openCount ).range.first   ).toString();
+        return searchExpressions(nExp);
 
-    val nExp = expression.replace("($expBetween)", searchExpressions(expBetween));
-
-    return searchExpressions(nExp);
+    }catch (error: Exception){
+        return searchParentheses("($expression)")
+    }
 
 }
 fun searchExpressions(expression: String): String {
     historic.add(expression);
+    println(expression)
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
         RegexExp.finalResult.containsMatchIn(expression) -> expression;
@@ -131,15 +137,15 @@ fun searchExpressions(expression: String): String {
     }
 }
 fun getResult(expression: String):Double{
-            var exp:String = "($expression)";
+            var exp:String = expression;
             exp = fixParentheses(exp)
             exp = removeMissingParentheses(exp)
             return RegexExp.numberSignedRegex.findAll(
                 searchExpressions(exp)
             ).first().value.toDouble();
-        }
+}
 fun main() {
-    var expression: String = "6*5)/-2(+5";
+    var expression: String = "6/2*)(2+1";
 
 
     historic = mutableSetOf();
@@ -151,4 +157,4 @@ fun main() {
 
 }
 
-}
+
