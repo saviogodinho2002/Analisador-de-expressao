@@ -20,10 +20,6 @@ fun calculateMulDiv(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
 
-    println()
-    println(expression)
-    println("$firstNumber $secondNumber")
-
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
         "/" -> (firstNumber.toDouble() / secondNumber.toDouble()).toString()
@@ -38,12 +34,10 @@ fun calculateAddSub(expression: String): String {
 
     val matchNumber = RegexExp.numberSignedRegex.findAll(currentExpression)
 
-    println(currentExpression)
+
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
-    println()
-    println(expression)
-    println("$firstNumber $secondNumber")
+
 
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
@@ -85,21 +79,6 @@ fun fixParentheses(expression: String):String{
 
     return fixParentheses(nExpression);
 }
-fun removeMissingParentheses(expression: String):String{
-    if(!RegexExp.matchMissNumber.containsMatchIn(expression)){
-        return expression;
-    }
-    val matchMissNumber = RegexExp.matchMissNumber.findAll(expression);
-    var subExp = matchMissNumber.first().value;
-    var nExpression = expression;
-    var whithoutParentheses = subExp.replaceFirst(RegexExp.openParenthesesRegex,"").replaceFirst(RegexExp.closeParenthesesRegex,"")
-
-    nExpression = nExpression.replace(subExp ,
-       whithoutParentheses
-    )
-
-    return removeMissingParentheses(nExpression);
-}
 fun searchParentheses(expression: String): String {
 
     val matchOpen = RegexExp.openParenthesesRegex.findAll(expression);
@@ -109,14 +88,14 @@ fun searchParentheses(expression: String): String {
     var close:Int;
     var expBetween:String;
     var openCount:Int;
-    println(expression)
+
     try{
         var iterator: Int = 0;
         do {
             open = matchOpen.elementAt(iterator).range.first;
             close = matchClose.first().range.first;
             expBetween = expression.subSequence(open + 1, close).toString();
-            println(expBetween)
+
             openCount = RegexExp.openParenthesesRegex.findAll(expBetween).count();
 
             iterator++;
@@ -128,13 +107,12 @@ fun searchParentheses(expression: String): String {
         return searchExpressions(nExp);
 
     }catch (error: StringIndexOutOfBoundsException){
-        println(error)
+
         return searchParentheses("($expression)")
     }
 }
 fun searchExpressions(expression: String): String {
     historic.add(expression);
-    println(expression)
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
         RegexExp.finalResult.containsMatchIn(expression)||expression.isEmpty() -> expression;
@@ -147,13 +125,12 @@ fun searchExpressions(expression: String): String {
 fun getResult(expression: String):Double{
             var exp:String = expression;
             exp = fixParentheses(exp)
-            exp = removeMissingParentheses(exp)
             return RegexExp.numberSignedRegex.findAll(
                 searchExpressions(exp)
             ).first().value.toDouble();
 }
 fun main() {
-    var expression: String = "-5+2";
+    var expression: String = ")(+2-)+(9*2)+))(10/5)";
 
 
     historic = mutableSetOf();
