@@ -1,9 +1,9 @@
 object RegexExp {
-    val mulDivRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
-    val addSubRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+    val mulDivRegex = "[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+    val addSubRegex = "[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^[-+]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[-+*/]*$".toRegex();
+    val finalResult = "^[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[-+*/]*$".toRegex();
     val numberRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
     val numberSignedRegex = "([+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+))".toRegex();
     val matchMissNumber = "[\\(]+[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)*[+-]{0,1}[\\)]+".toRegex();
@@ -20,6 +20,10 @@ fun calculateMulDiv(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
 
+    println()
+    println(expression)
+    println("$firstNumber $secondNumber")
+
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
         "/" -> (firstNumber.toDouble() / secondNumber.toDouble()).toString()
@@ -34,9 +38,12 @@ fun calculateAddSub(expression: String): String {
 
     val matchNumber = RegexExp.numberSignedRegex.findAll(currentExpression)
 
+    println(currentExpression)
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
-
+    println()
+    println(expression)
+    println("$firstNumber $secondNumber")
 
     var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
         "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
@@ -146,7 +153,7 @@ fun getResult(expression: String):Double{
             ).first().value.toDouble();
 }
 fun main() {
-    var expression: String = "5)(+)(2";
+    var expression: String = "-5+2";
 
 
     historic = mutableSetOf();
