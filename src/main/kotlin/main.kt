@@ -1,14 +1,23 @@
 object RegexExp {
-    val mulDivRegex = "[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[*/]{1}[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
-    val addSubRegex = "[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[+-]{1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
+    val mulDivSimbols = "*/";
+    val addSubSimbols = "-+";
+    val basicOperationSymbols = "$addSubSimbols$mulDivSimbols";
+    val number = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)";
+    val numberSigned = "([$addSubSimbols]?$number)";
+
+    val mulDivRegex = "$number[$mulDivSimbols]{1}$numberSigned".toRegex();
+    val addSubRegex = "$numberSigned$numberSigned".toRegex();
     val openParenthesesRegex = "\\(".toRegex();
     val closeParenthesesRegex = "\\)".toRegex();
-    val finalResult = "^[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)[-+*/]*$".toRegex();
-    val numberRegex = "(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)".toRegex();
-    val numberSignedRegex = "([+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+))".toRegex();
-    val matchMissNumber = "[\\(]+[+-]{0,1}(\\d+\\.\\d*|\\d*\\.\\d+|\\d+)*[+-]{0,1}[\\)]+".toRegex();
-    val operationSimbols = "[-+*/]".toRegex();
-    val multSinal = "[-+]{2}".toRegex();
+    val finalResult = "^$numberSigned[$basicOperationSymbols]*$".toRegex();
+
+    val numberSignedRegex = numberSigned.toRegex();
+
+    val addSubSymbolRegex = "[$addSubSimbols]".toRegex();
+    val mulDivSymbolRegex = "[$mulDivSimbols]".toRegex();
+
+    val operationSimbols = "[$basicOperationSymbols]".toRegex();
+    val multSinal = "[$addSubSimbols]{2}".toRegex();
 
 
 }
@@ -20,11 +29,13 @@ fun calculateMulDiv(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
 
-    var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
+  
+    var result = when (RegexExp.mulDivSymbolRegex.findAll(currentExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
         "/" -> (firstNumber.toDouble() / secondNumber.toDouble()).toString()
         else -> throw Exception("Expressão mal formulada");
     }
+
     return searchExpressions(expression.replace(currentExpression, result));
 
 }
@@ -34,17 +45,12 @@ fun calculateAddSub(expression: String): String {
 
     val matchNumber = RegexExp.numberSignedRegex.findAll(currentExpression)
 
-
     val firstNumber = matchNumber.first().value;
     val secondNumber = matchNumber.elementAt(1).value
 
 
-    var result = when (RegexExp.operationSimbols.findAll(currentExpression).first().value) {
-        "+" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
-        "-" -> (firstNumber.toDouble() + secondNumber.toDouble()).toString()
-        else -> throw Exception("Expressão mal formulada");
-    }
-    return searchExpressions(expression.replace(currentExpression, result));
+    val result = ( firstNumber.toDouble() + secondNumber.toDouble() ).toString()
+    return searchExpressions(  expression.replace(currentExpression, result)   );
 
 }
 fun sinalGame(expression: String):String{
@@ -113,6 +119,7 @@ fun searchParentheses(expression: String): String {
 }
 fun searchExpressions(expression: String): String {
     historic.add(expression);
+
     return when{
         RegexExp.multSinal.containsMatchIn(expression) -> sinalGame(expression);
         RegexExp.finalResult.containsMatchIn(expression)||expression.isEmpty() -> expression;
@@ -130,15 +137,15 @@ fun getResult(expression: String):Double{
             ).first().value.toDouble();
 }
 fun main() {
-    var expression: String = ")(+2-)+(9*2)+))(10/5)";
+    var expression: String = "-6/-2*(2+1)";
 
 
     historic = mutableSetOf();
     println(   getResult(expression) );
-    
     historic.forEach {
-       println(it)
-   }
+        println(it)
+    }
+
 
 }
 
