@@ -29,7 +29,7 @@ fun calculateMulDiv(expression: String): String {
     val firstNumber = matchNumber.first().value;
     val secondNumber =  matchNumber.elementAt(1).value
 
-  
+
     var result = when (RegexExp.mulDivSymbolRegex.findAll(currentExpression).first().value) {
         "*" -> (firstNumber.toDouble() * secondNumber.toDouble()).toString()
         "/" -> (firstNumber.toDouble() / secondNumber.toDouble()).toString()
@@ -69,10 +69,8 @@ fun fixParentheses(expression: String):String{
     val matchClose = RegexExp.closeParenthesesRegex.findAll(expression);
     val diff = matchOpen.count() - matchClose.count();
 
-    if(diff == 0){
-        return expression;
-    }
     var nExpression= expression;
+
     if(diff < 0){
         repeat(diff * -1){
             nExpression = "($nExpression";
@@ -83,7 +81,7 @@ fun fixParentheses(expression: String):String{
         }
     }
 
-    return fixParentheses(nExpression);
+    return nExpression;
 }
 fun searchParentheses(expression: String): String {
 
@@ -137,7 +135,7 @@ fun getResult(expression: String):Double{
             ).first().value.toDouble();
 }
 fun main() {
-    var expression: String = "-6/-2*(2+1)";
+    var expression: String = "-6/)(-2*(2+1)";
 
 
     historic = mutableSetOf();
